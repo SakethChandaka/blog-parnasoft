@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { FlipWords } from './components/FlipWords'
 
 interface MousePosition {
@@ -18,13 +19,15 @@ interface BlogPost {
   readTime: string
   tags: string[]
   featured?: boolean
-  authorType: 'md' | 'general' | 'notice' // New field for author categorization
+  authorType: 'md' | 'general' | 'notice'
+  slug: string // Add slug for URL-friendly routing
 }
 
 export default function BlogPage() {
   const [hoveredCard, setHoveredCard] = useState<number | null>(null)
   const [mousePosition, setMousePosition] = useState<MousePosition>({ x: 0, y: 0 })
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
+  const router = useRouter()
 
   const blogPosts: BlogPost[] = [
     {
@@ -37,19 +40,21 @@ export default function BlogPage() {
       readTime: "8 min read",
       tags: ["AI", "Development", "Future Tech", "Automation"],
       featured: true,
-      authorType: 'md'
+      authorType: 'md',
+      slug: "future-of-ai-in-software-development"
     },
     {
       id: 2,
-      title: "Building Scalable Microservices Architecture",
-      excerpt: "A comprehensive guide to designing and implementing microservices that can handle enterprise-level traffic and complexity while maintaining reliability.",
+      title: "The Scaling Imperative",
+      excerpt: "Why Building for Tomorrow Defines Success in Software and Business.",
       category: "Architecture",
-      author: "Michael Chen",
-      publishedAt: "2025-06-12",
+      author: "Krishna Gummuluri (Managing Director, Parnasoft)",
+      publishedAt: "2025-06-17",
       readTime: "12 min read",
-      tags: ["Microservices", "Architecture", "Scalability", "Enterprise"],
-      featured: false,
-      authorType: 'general'
+      tags: ["Design", "Architecture", "Scalability", "Enterprise"],
+      featured: true,
+      authorType: 'md',
+      slug: "The-Scaling-Imperative"
     },
     {
       id: 3,
@@ -61,7 +66,8 @@ export default function BlogPage() {
       readTime: "6 min read",
       tags: ["CSS", "Frontend", "Web Design"],
       featured: false,
-      authorType: 'general'
+      authorType: 'general',
+      slug: "modern-css-techniques-for-2025"
     },
     {
       id: 4,
@@ -73,7 +79,8 @@ export default function BlogPage() {
       readTime: "5 min read",
       tags: ["Security", "Guidelines", "Important"],
       featured: true,
-      authorType: 'notice'
+      authorType: 'notice',
+      slug: "new-security-guidelines"
     },
     {
       id: 5,
@@ -85,7 +92,8 @@ export default function BlogPage() {
       readTime: "7 min read",
       tags: ["GraphQL", "REST", "APIs"],
       featured: false,
-      authorType: 'general'
+      authorType: 'general',
+      slug: "understanding-graphql-vs-rest-apis"
     },
     {
       id: 6,
@@ -97,12 +105,18 @@ export default function BlogPage() {
       readTime: "9 min read",
       tags: ["Vision", "Leadership", "Innovation", "Future"],
       featured: true,
-      authorType: 'md'
+      authorType: 'md',
+      slug: "company-vision-embracing-innovation-2025"
     }
   ]
 
   // Filter posts to only show featured ones
   const featuredPosts = blogPosts.filter(post => post.featured === true)
+
+  // Function to navigate to individual blog post
+  const handleReadMore = (slug: string) => {
+    router.push(`/blog/${slug}`)
+  }
 
   // Function to get badge info based on author type
   const getBadgeInfo = (authorType: string) => {
@@ -281,13 +295,16 @@ export default function BlogPage() {
 
                       {/* Read More Button with dynamic styling */}
                       <div className="flex justify-start">
-                        <button className={`inline-flex items-center px-6 py-3 font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl group ${
-                          post.authorType === 'md'
-                            ? 'bg-gradient-to-r from-[#ff6b35] to-[#f7931e] text-white hover:from-[#e55a2b] hover:to-[#e08912]'
-                            : post.authorType === 'notice'
-                            ? 'bg-gradient-to-r from-[#e74c3c] to-[#c0392b] text-white hover:from-[#d62c1a] hover:to-[#a93226]'
-                            : 'bg-[#00d8e8] text-white hover:bg-[#00c4d4]'
-                        }`}>
+                        <button 
+                          onClick={() => handleReadMore(post.slug)}
+                          className={`inline-flex items-center px-6 py-3 font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl group ${
+                            post.authorType === 'md'
+                              ? 'bg-gradient-to-r from-[#ff6b35] to-[#f7931e] text-white hover:from-[#e55a2b] hover:to-[#e08912]'
+                              : post.authorType === 'notice'
+                              ? 'bg-gradient-to-r from-[#e74c3c] to-[#c0392b] text-white hover:from-[#d62c1a] hover:to-[#a93226]'
+                              : 'bg-[#00d8e8] text-white hover:bg-[#00c4d4]'
+                          }`}
+                        >
                           {post.authorType === 'notice' ? 'Read Important Notice' : 'Read More'}
                           <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
