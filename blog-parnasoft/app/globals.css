@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: white) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Link styling for Services link */
+.link-res {
+  white-space: nowrap;
+}
+
+.link-res a {
+  position: relative;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.link-res a::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -2px;
+  left: 0;
+  background-color: #ffffff;
+  transition: width 0.3s ease;
+}
+
+.link-res a:hover::after {
+  width: 100%;
+}
+
+.link-res a:hover {
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.link-res:visited a {
+  color: #00d8e8;
+}
