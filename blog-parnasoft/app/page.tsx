@@ -144,7 +144,7 @@ export default function BlogPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="pt-20 bg-white">
+      <section className="pt-20 sm:pt-10 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-0">
             {/* Header similar to careers page */}
@@ -219,7 +219,7 @@ export default function BlogPage() {
 
                   <div className="relative z-10 p-8">
                     {/* Post Header */}
-                    <div className="mb-6">
+                    <div className="mb-6 mt-6">
                       <h2 className="text-2xl lg:text-3xl font-bold text-[#1e3a4b] mb-4 group-hover:text-[#00d8e8] transition-colors duration-300">
                         {post.title}
                       </h2>
@@ -280,7 +280,7 @@ export default function BlogPage() {
                       </div>
 
                       {/* Read More Button with dynamic styling */}
-                      <div className="flex justify-end">
+                      <div className="flex justify-start">
                         <button className={`inline-flex items-center px-6 py-3 font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl group ${
                           post.authorType === 'md'
                             ? 'bg-gradient-to-r from-[#ff6b35] to-[#f7931e] text-white hover:from-[#e55a2b] hover:to-[#e08912]'
