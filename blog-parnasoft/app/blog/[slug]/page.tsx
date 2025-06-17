@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { notFound } from 'next/navigation'
 
@@ -19,9 +19,9 @@ interface BlogPost {
 }
 
 interface BlogPostPageProps {
-  params: {
+  params: Promise<{
     slug: string
-  }
+  }>
 }
 
 // This would normally come from your Azure Function
@@ -277,10 +277,13 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
   const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>([])
   const router = useRouter()
 
+  // Unwrap the params Promise using React.use()
+  const resolvedParams = use(params)
+
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const blogPost = await getBlogPostBySlug(params.slug)
+        const blogPost = await getBlogPostBySlug(resolvedParams.slug)
         if (!blogPost) {
           notFound()
           return
@@ -299,7 +302,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
     }
 
     fetchPost()
-  }, [params.slug])
+  }, [resolvedParams.slug])
 
   if (loading) {
     return (

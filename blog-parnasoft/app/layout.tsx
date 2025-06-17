@@ -17,6 +17,10 @@ export const metadata: Metadata = {
     title: 'Parnasoft Blog - Insights & Innovation',
     description: 'Discover the latest insights, trends, and innovations in technology from the Parnasoft team.',
     type: 'website',
+    
+  },
+  icons: {
+    icon: '/blue-white.png',
   },
 }
 
