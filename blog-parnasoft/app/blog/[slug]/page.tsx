@@ -1,10 +1,12 @@
 'use client'
-
+//blog slug route Page - app/blog/[slug]/page.tsx
 import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { notFound } from 'next/navigation'
 import { blogService, getBadgeInfo, getVisibilityBadge } from '../../services/blogService'
 import { BlogPost } from '../../types/blog'
+import { UserType } from '../../types/blog'
+import { useAuth } from '../../contexts/AuthContext'
 
 interface BlogPostPageProps {
   params: Promise<{
@@ -18,8 +20,9 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
-  // In future, you'll determine user type from auth context
-  const userType: 'anonymous' | 'internal' | 'admin' = 'anonymous' // This will come from your auth context
+  // Get user type from auth context
+  const { user } = useAuth()
+  const userType: UserType = user?.userType || 'anonymous'
 
   // Unwrap the params Promise using React.use()
   const resolvedParams = use(params)
@@ -213,19 +216,19 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
           {/* Badges Container */}
           <div className="flex justify-start gap-4 mb-6">
             {/* Author Type Badge */}
-            <span className={`px-4 py-2 bg-gradient-to-r ${badgeInfo.gradient} text-white text-sm font-bold rounded-full shadow-lg flex items-center gap-2`}>
-              <span className="text-lg">{badgeInfo.icon}</span>
+            <span className={`px-4 py-2 bg-gradient-to-r ${badgeInfo.gradient} text-white text-sm font-bold text-center rounded-full shadow-lg flex items-center gap-2`}>
+              <span className="text-lg ">{badgeInfo.icon}</span>
               {badgeInfo.text}
             </span>
             
             {/* Visibility Badge */}
-            <span className={`px-4 py-2 text-sm text-center content-center font-bold rounded-full border ${visibilityBadge.className}`}>
+            <span className={` flex px-4 py-2 text-sm text-center items-center font-bold rounded-full border ${visibilityBadge.className}`}>
               {visibilityBadge.text}
             </span>
 
             {/* User Access Level Indicator (for development) */}
             {process.env.NODE_ENV === 'development' && (
-              <span className="px-3 py-1 bg-gray-100 text-gray-600 content-center text-center text-xs font-bold rounded-full border border-gray-200">
+              <span className="flex px-3 py-1 bg-gray-100 text-gray-600 items-center text-center text-xs font-bold rounded-full border border-gray-200">
                 Access: {userType}
               </span>
             )}
@@ -244,14 +247,14 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
             <span className="px-4 py-2 bg-[#00d8e8]/10 text-[#00d8e8] rounded-full text-sm font-semibold">
               {post.readTime}
             </span>
-            <span className={`px-3 py-1 text-xs font-bold rounded-full ${
+            <span className={`px-4 py-2 text-sm font-bold rounded-full ${
               post.authorType === 'md' 
                 ? 'bg-[#ff6b35]/10 text-[#ff6b35]' 
                 : post.authorType === 'notice'
                 ? 'bg-[#e74c3c]/10 text-[#e74c3c]'
                 : 'bg-[#00d8e8]/10 text-[#00d8e8]'
             }`}>
-              {post.authorType === 'md' ? 'LEADERSHIP' : post.authorType === 'notice' ? 'NOTICE' : 'ARTICLE'}
+              {post.authorType === 'md' ? 'Leadership' : post.authorType === 'notice' ? 'Notice' : 'Article'}
             </span>
           </div>
 

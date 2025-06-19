@@ -1,6 +1,8 @@
+'use client'
 import type { Metadata } from 'next'
 import { Montserrat } from 'next/font/google'
 import './globals.css'
+import { AuthProvider, useAuth } from './contexts/AuthContext'
 
 const montserrat = Montserrat({ 
   subsets: ['latin'],
@@ -8,20 +10,97 @@ const montserrat = Montserrat({
   variable: '--font-montserrat'
 })
 
-export const metadata: Metadata = {
-  title: 'Parnasoft Blog - Insights & Innovation',
-  description: 'Discover the latest insights, trends, and innovations in technology from the Parnasoft team.',
-  keywords: 'technology, blog, insights, innovation, development, parnasoft',
-  authors: [{ name: 'Parnasoft Technologies' }],
-  openGraph: {
-    title: 'Parnasoft Blog - Insights & Innovation',
-    description: 'Discover the latest insights, trends, and innovations in technology from the Parnasoft team.',
-    type: 'website',
-    
-  },
-  icons: {
-    icon: '/blue-white.png',
-  },
+// Navigation component that uses auth context
+function Navigation() {
+  const { user, logout, loading } = useAuth()
+  
+  // Default to anonymous if no user or still loading
+  const userType = user?.userType || 'anonymous'
+
+  const handleLogout = async () => {
+    await logout()
+    window.location.href = '/' // Redirect to home page
+  }
+
+  return (
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white shadow-[0_4px_1px_-1px_#00d8e8] border-b border-gray-100">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-20">
+          {/* Logo */}
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-[white] rounded-lg flex items-center justify-center">
+              <img src="/blue-dark.png" alt="Parnasoft" />
+            </div>
+            <span className="font-bold text-[#1e3a4b] text-xl">Parnasoft Blog</span>
+          </div>
+
+          {/* Navigation Links */}
+          <div className="flex items-center space-x-4">
+            {/* Login Button - Only visible for anonymous users */}
+            {userType === 'anonymous' && !loading && (
+              <a
+                href="/login"
+                className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#00d8e8] to-[#00c4d4] text-white text-sm font-semibold rounded-lg hover:from-[#00c4d4] hover:to-[#00b8c8] transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                </svg>
+                Sign In
+              </a>
+            )}
+
+            {/* Admin Button - Only visible for admin users */}
+            {userType === 'admin' && (
+              <a
+                href="/admin"
+                className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#ff6b35] to-[#f7931e] text-white text-sm font-semibold rounded-lg hover:from-[#e55a2b] hover:to-[#e08912] transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Admin Panel
+              </a>
+            )}
+
+            {/* User Menu - Only visible for authenticated users */}
+            {userType !== 'anonymous' && user && (
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-2 px-3 py-2 bg-gray-100 rounded-lg">
+                  <div className="w-8 h-8 bg-gradient-to-r from-[#00d8e8] to-[#00c4d4] rounded-full flex items-center justify-center">
+                    <span className="text-white text-sm font-bold">
+                      {user.name ? user.name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                  <div className="text-sm">
+                    <p className="font-semibold text-[#1e3a4b]">{user.name || user.email}</p>
+                    <p className="text-xs text-gray-600 capitalize">{userType}</p>
+                  </div>
+                </div>
+                
+                <button
+                  onClick={handleLogout}
+                  className="inline-flex items-center px-3 py-2 bg-gray-500 text-white text-sm font-semibold rounded-lg hover:bg-gray-600 transition-all duration-200"
+                  title="Sign Out"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                  </svg>
+                </button>
+              </div>
+            )}
+
+            {/* User Type Indicator (for development) */}
+            {process.env.NODE_ENV === 'development' && (
+              <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-bold rounded-full border border-gray-200">
+                {userType} {user && `(${user.email})`}
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+    </nav>
+  )
 }
 
 export default function RootLayout({
@@ -32,68 +111,59 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body className={`${montserrat.className} ${montserrat.variable} antialiased bg-white min-h-screen`}>
-        {/* Navigation */}
-        <nav className="fixed top-0 left-0 right-0 z-50 bg-white shadow-[0_4px_1px_-1px_#00d8e8] border-b border-gray-100">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-center items-center h-20">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-[white] rounded-lg flex items-center justify-center">
-                  <img src="blue-dark.png" alt="#" />
-                </div>
-                <span className="font-bold text-[#1e3a4b] text-xl">Parnasoft Blog</span>
-              </div>
-            </div>
-          </div>
-        </nav>
+        <AuthProvider>
+          {/* Navigation */}
+          <Navigation />
 
-        {/* Main Content */}
-        <main className="pt-20 mb-10">
-          {children}
-        </main>
+          {/* Main Content */}
+          <main className="pt-20 mb-10">
+            {children}
+          </main>
 
-        {/* Footer */}
-        <footer className="bg-[#1e3a4b] text-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-              <div className="col-span-1 md:col-span-2">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="w-12 h-12 bg-[#1e3a4b] rounded-lg flex items-center justify-center">
-                    <img src="blue-white.png" alt="#" />
+          {/* Footer */}
+          <footer className="bg-[#1e3a4b] text-white">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div className="col-span-1 md:col-span-2">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="w-12 h-12 bg-[#1e3a4b] rounded-lg flex items-center justify-center">
+                      <img src="/blue-white.png" alt="Parnasoft" />
+                    </div>
+                    <span className="font-bold text-xl">Parnasoft Blog</span>
                   </div>
-                  <span className="font-bold text-xl">Parnasoft Blog</span>
+                  <p className="text-white mb-6 max-w-md font-semibold text-sm">
+                    Sharing insights, innovations, and expertise in technology to help businesses and developers stay ahead of the curve.
+                  </p>
+                  <div className="flex space-x-4">
+                    <a href="https://www.linkedin.com/company/parnasoft-technologies-pvt-ltd" target="_blank" className="text-gray-400 hover:text-[#00d8e8] transition-colors">
+                      <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                      </svg>
+                    </a>
+                  </div>
                 </div>
-                <p className="text-gray-300 mb-6 max-w-md">
-                  Sharing insights, innovations, and expertise in technology to help businesses and developers stay ahead of the curve.
-                </p>
-                <div className="flex space-x-4">
-                  <a href="https://www.linkedin.com/company/parnasoft-technologies-pvt-ltd" target="_blank" className="text-gray-400 hover:text-[#00d8e8] transition-colors">
-                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                    </svg>
-                  </a>
+                <div>
+                  <h3 className="font-semibold text-lg mb-4 text-[#00d8e8]">QUICK LINKS</h3>
+                  <ul className="space-y-2">
+                    <li className="link-res font-semibold text-sm"><a href="https://parnasoft.com" target="_blank" className="text-md">Main Hub</a></li>
+                  </ul>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg mb-4 text-[#00d8e8]">CATEGORIES</h3>
+                  <ul className="space-y-2">
+                    <li className="link-res font-semibold text-sm"><a href="#Cloud Computing" className="">Technology</a></li>
+                    <li className="link-res font-semibold text-sm"><a href="#Backend" className="">Development</a></li>
+                    <li className="link-res font-semibold text-sm"><a href="#Architecture" className="">Design</a></li>
+                    <li className="link-res font-semibold text-sm"><a href="#AI & Technology" className="">Innovation</a></li>
+                  </ul>
                 </div>
               </div>
-              <div>
-                <h3 className="font-semibold text-lg mb-4 text-[#00d8e8]">Quick Links</h3>
-                <ul className="space-y-2">
-                  <li className="link-res"><a href="#" className="text-md">Main Hub</a></li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg mb-4 text-[#00d8e8]">Categories</h3>
-                <ul className="space-y-2">
-                  <li className="link-res"><a href="#Cloud Computing" className="">Technology</a></li>
-                  <li className="link-res"><a href="#Backend" className="">Development</a></li>
-                  <li className="link-res"><a href="#Architecture" className="">Design</a></li>
-                  <li className="link-res"><a href="#AI & Technology" className="">Innovation</a></li>
-                </ul>
+              <div className="border-t border-gray-600 mt-8 pt-8 text-center text-gray-400 font-semibold text-sm">
+                <p>&copy; 2025 Parnasoft Technologies. All rights reserved.</p>
               </div>
             </div>
-            <div className="border-t border-gray-600 mt-8 pt-8 text-center text-gray-400">
-              <p>&copy; 2025 Parnasoft Technologies. All rights reserved.</p>
-            </div>
-          </div>
-        </footer>
+          </footer>
+        </AuthProvider>
       </body>
     </html>
   )

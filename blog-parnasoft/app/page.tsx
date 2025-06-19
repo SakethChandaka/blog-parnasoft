@@ -1,10 +1,11 @@
 'use client'
-
+//Main Page - app/page.tsx
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { FlipWords } from './components/FlipWords'
 import { blogService, getBadgeInfo, getVisibilityBadge } from './services/blogService'
 import { BlogPost, UserType } from './types/blog'
+import { useAuth } from './contexts/AuthContext'
 
 interface MousePosition {
   x: number
@@ -20,8 +21,9 @@ export default function BlogPage() {
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
   const router = useRouter()
 
-  // In future, you'll determine user type from auth context
-  const userType: UserType = 'anonymous' // This will come from your auth context
+  // Get user type from auth context
+  const { user } = useAuth()
+  const userType: UserType = user?.userType || 'anonymous'
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -31,17 +33,43 @@ export default function BlogPage() {
         
         // Get featured posts based on user access level
         const posts = await blogService.getFeaturedPosts(userType)
-        setBlogPosts(posts)
+        
+        // Ensure we always have an array, even if API returns something unexpected
+        const postsArray = Array.isArray(posts) ? posts : []
+        setBlogPosts(postsArray)
+        
+        // Optional: Log for debugging in development
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Fetched posts:', postsArray.length, 'posts for user type:', userType)
+        }
+        
       } catch (err) {
         console.error('Error fetching blog posts:', err)
-        setError('Failed to load blog posts. Please try again later.')
+        
+        // More specific error handling
+        if (err instanceof Error) {
+          if (err.message.includes('500')) {
+            setError('Server is experiencing issues. Please try again later.')
+          } else if (err.message.includes('404')) {
+            setError('No articles found.')
+          } else if (err.message.includes('Network error')) {
+            setError('Unable to connect to the server. Please check your internet connection.')
+          } else {
+            setError('Failed to load blog posts. Please try again later.')
+          }
+        } else {
+          setError('An unexpected error occurred. Please try again later.')
+        }
+        
+        // Set empty array as fallback
+        setBlogPosts([])
       } finally {
         setLoading(false)
       }
     }
 
     fetchPosts()
-  }, [userType])
+  }, [userType]) // Refetch when userType changes
 
   // Function to navigate to individual blog post
   const handleReadMore = (slug: string) => {
@@ -60,6 +88,24 @@ export default function BlogPage() {
     }
   }
 
+  // Retry function for when there's an error
+  const handleRetry = async () => {
+    setError(null)
+    setLoading(true)
+    
+    try {
+      const posts = await blogService.getFeaturedPosts(userType)
+      const postsArray = Array.isArray(posts) ? posts : []
+      setBlogPosts(postsArray)
+    } catch (err) {
+      console.error('Retry failed:', err)
+      setError('Still unable to load articles. Please try again later.')
+      setBlogPosts([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -74,15 +120,23 @@ export default function BlogPage() {
   if (error) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
+        <div className="text-center max-w-md mx-auto px-4">
           <div className="text-red-500 text-6xl mb-4">⚠️</div>
           <p className="text-[#1e3a4b] font-semibold text-lg mb-4">{error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
-            className="px-6 py-3 bg-[#00d8e8] text-white rounded-lg hover:bg-[#00c4d4] transition-colors duration-200"
-          >
-            Try Again
-          </button>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <button 
+              onClick={handleRetry} 
+              className="px-6 py-3 bg-[#00d8e8] text-white rounded-lg hover:bg-[#00c4d4] transition-colors duration-200"
+            >
+              Try Again
+            </button>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors duration-200"
+            >
+              Refresh Page
+            </button>
+          </div>
         </div>
       </div>
     )
@@ -117,6 +171,7 @@ export default function BlogPage() {
               <div className="inline-block bg-gray-100 border border-gray-300 rounded-lg px-3 py-1 mb-4">
                 <p className="text-sm text-gray-600">
                   <strong>Access Level:</strong> {userType} • <strong>Posts:</strong> {blogPosts.length}
+                  {user && <span> • <strong>User:</strong> {user.name} ({user.email})</span>}
                 </p>
               </div>
             )}
@@ -130,8 +185,14 @@ export default function BlogPage() {
           {blogPosts.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-[#00d8e8] text-6xl mb-4">📝</div>
-              <p className="text-[#1e3a4b] font-semibold text-lg">No articles available at the moment.</p>
-              <p className="text-[#1e3a4b] text-sm mt-2">Please check back later for new content.</p>
+              <h3 className="text-[#1e3a4b] font-semibold text-xl mb-2">No Articles Available</h3>
+              <p className="text-[#1e3a4b] text-sm mb-6">There are currently no articles to display. New content will appear here when published.</p>
+              <button 
+                onClick={handleRetry}
+                className="px-6 py-3 bg-[#00d8e8] text-white rounded-lg hover:bg-[#00c4d4] transition-colors duration-200"
+              >
+                Refresh
+              </button>
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-8">
@@ -153,7 +214,7 @@ export default function BlogPage() {
                     id={post.category}
                   >
                     {/* Badges Container */}
-                    <div className="absolute top-4 right-4 z-20 flex flex-col gap-2">
+                    <div className="absolute w-full top-4 z-20 px-7 flex flex-row gap-2 justify-start">
                       {/* Author Type Badge */}
                       <span className={`px-3 py-1 bg-gradient-to-r ${badgeInfo.gradient} text-white text-xs font-bold rounded-full shadow-lg flex items-center gap-1 animate-pulse`}>
                         <span className="text-sm">{badgeInfo.icon}</span>
@@ -161,7 +222,7 @@ export default function BlogPage() {
                       </span>
                       
                       {/* Visibility Badge */}
-                      <span className={`px-3 py-1 text-xs font-bold text-center rounded-full border ${visibilityBadge.className}`}>
+                      <span className={`flex px-3 py-1 text-xs font-bold text-center items-center rounded-full border ${visibilityBadge.className}`}>
                         {visibilityBadge.text}
                       </span>
                     </div>
@@ -210,14 +271,14 @@ export default function BlogPage() {
                             {post.readTime}
                           </span>
                           {/* Author type indicator */}
-                          <span className={`px-3 py-1 text-xs font-bold rounded-full ${
+                          <span className={`px-4 py-2 text-sm font-bold rounded-full ${
                             post.authorType === 'md' 
                               ? 'bg-[#ff6b35]/10 text-[#ff6b35]' 
                               : post.authorType === 'notice'
                               ? 'bg-[#e74c3c]/10 text-[#e74c3c]'
                               : 'bg-[#00d8e8]/10 text-[#00d8e8]'
                           }`}>
-                            {post.authorType === 'md' ? 'LEADERSHIP' : post.authorType === 'notice' ? 'NOTICE' : 'ARTICLE'}
+                            {post.authorType === 'md' ? 'Leadership' : post.authorType === 'notice' ? 'Notice' : 'Article'}
                           </span>
                         </div>
                       </div>
