@@ -1,9 +1,9 @@
-// app/types/auth.ts
+// app/types/auth.tsx
 export interface User {
   id: string
   email: string
   name: string
-  userType: 'anonymous' | 'internal' | 'admin'
+  userType: 'anonymous' | 'internal' | 'admin' | 'super_admin'
   token?: string
 }
 

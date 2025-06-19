@@ -1,6 +1,6 @@
 // app/types/blog.ts
 
-export type UserType = 'anonymous' | 'internal' | 'admin'
+export type UserType = 'anonymous' | 'internal' | 'admin' | 'super_admin'
 
 export type AuthorType = 'md' | 'general' | 'notice' // Using your original values
 

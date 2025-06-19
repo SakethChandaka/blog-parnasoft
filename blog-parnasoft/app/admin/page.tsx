@@ -35,9 +35,9 @@ export default function AdminPage({}: AdminPageProps) {
       return // Still loading auth, don't redirect yet
     }
 
-    // Check if user is admin after auth has loaded
-    if (userType !== 'admin') {
-      console.log('User is not admin, redirecting. User type:', userType, 'User:', user)
+    // Check if user has admin access after auth has loaded
+    if (userType !== 'admin' && userType !== 'super_admin') {
+      console.log('User does not have admin access, redirecting. User type:', userType, 'User:', user)
       router.push('/')
       return
     }
@@ -166,7 +166,8 @@ export default function AdminPage({}: AdminPageProps) {
       ),
       count: blogPosts.length
     },
-    {
+    // Only show users tab for super_admin
+    ...(userType === 'super_admin' ? [{
       id: 'users' as AdminTab,
       name: 'User Management',
       icon: (
@@ -174,7 +175,7 @@ export default function AdminPage({}: AdminPageProps) {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
         </svg>
       )
-    },
+    }] : []),
     {
       id: 'analytics' as AdminTab,
       name: 'Analytics',
@@ -297,7 +298,7 @@ export default function AdminPage({}: AdminPageProps) {
           />
         )}
 
-        {activeTab === 'users' && (
+        {activeTab === 'users' && userType === 'super_admin' && (
           <UserManagement />
         )}
 

@@ -62,14 +62,14 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
   }, [resolvedParams.slug, userType])
 
   // Helper function to check if user can access the post
-  const checkPostAccess = (post: BlogPost, userType: 'anonymous' | 'internal' | 'admin'): boolean => {
+  const checkPostAccess = (post: BlogPost, userType: UserType): boolean => {
     switch (post.visibility) {
       case 'public':
         return true
       case 'internal':
-        return userType === 'internal' || userType === 'admin'
+        return userType === 'internal' || userType === 'admin' || userType === 'super_admin'
       case 'restricted':
-        return userType === 'admin'
+        return userType === 'admin' || userType === 'super_admin'
       default:
         return false
     }

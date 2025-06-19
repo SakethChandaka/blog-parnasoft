@@ -1,4 +1,4 @@
-// services/userService.ts - Fixed version
+// services/userService.tsx - Fixed version
 import { User, CreateUserRequest, UpdateUserRequest, UserType } from '../types/user'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || ''
