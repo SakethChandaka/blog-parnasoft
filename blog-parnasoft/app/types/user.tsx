@@ -1,5 +1,5 @@
-// types/user.ts
-export type UserType = 'admin' | 'internal' | 'anonymous'
+// types/user.tsx
+export type UserType = 'super_admin' | 'admin' | 'internal' | 'anonymous'
 
 export interface User {
   id: string

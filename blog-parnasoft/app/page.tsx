@@ -145,7 +145,7 @@ export default function BlogPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="pt-20 sm:pt-10 bg-white">
+      <section className="pt-10 md:pt-15 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-0">
             {/* Header similar to careers page */}
