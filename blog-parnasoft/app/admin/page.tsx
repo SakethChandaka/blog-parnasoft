@@ -584,7 +584,7 @@ function BlogManagementContent({
                           <div className="text-sm font-medium text-gray-900">{post.author}</div>
                           <span className={`inline-flex px-2 py-1 text-xs font-bold rounded-full ${
                             post.authorType === 'md' 
-                              ? 'bg-orange-100 text-orange-800' 
+                              ? 'bg-gradient-to-r from-[#6a11cb] to-[#2575fc] text-white' 
                               : post.authorType === 'notice'
                               ? 'bg-red-100 text-red-800'
                               : 'bg-blue-100 text-blue-800'
