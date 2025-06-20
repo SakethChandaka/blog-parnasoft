@@ -231,6 +231,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="scroll-smooth">
+      <head>
+        <link rel="icon" type="image/png" href="/blue-white.png" />
+      </head>
       <body className={`${montserrat.className} ${montserrat.variable} antialiased bg-white min-h-screen`}>
         <AuthProvider>
           {/* Navigation */}
