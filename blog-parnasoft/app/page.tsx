@@ -229,21 +229,21 @@ export default function BlogPage() {
 
                     {/* Special glow effect for MD posts */}
                     {post.authorType === 'md' && (
-                      <div className="absolute inset-0 bg-gradient-to-r from-[#ff6b35]/5 to-[#f7931e]/5 pointer-events-none z-0" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-[#6a11cb]/1 to-[#2575fc]/9 pointer-events-none z-0" />
                     )}
 
                     {/* Special urgent effect for notice posts */}
                     {post.authorType === 'notice' && (
-                      <div className="absolute inset-0 bg-gradient-to-r from-[#e74c3c]/5 to-[#c0392b]/5 pointer-events-none z-0" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-[#e74c3c]/1 to-[#c0392b]/9 pointer-events-none z-0" />
                     )}
 
                     {/* Special effect for internal/restricted posts */}
                     {post.visibility === 'internal' && (
-                      <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/5 to-yellow-500/5 pointer-events-none z-0" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/2 to-yellow-500/9 pointer-events-none z-0" />
                     )}
 
                     {post.visibility === 'restricted' && (
-                      <div className="absolute inset-0 bg-gradient-to-r from-red-400/5 to-red-500/5 pointer-events-none z-0" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-red-400/2 to-red-500/5 pointer-events-none z-0" />
                     )}
 
                     {/* Gradient overlay on hover */}
@@ -325,7 +325,7 @@ export default function BlogPage() {
                             onClick={() => handleReadMore(post.slug)}
                             className={`inline-flex items-center px-6 py-3 font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl group ${
                               post.authorType === 'md'
-                                ? 'bg-gradient-to-r from-[#ff6b35] to-[#f7931e] text-white hover:from-[#e55a2b] hover:to-[#e08912]'
+                                ? 'bg-gradient-to-r from-[#6a11cb] to-[#2575fc] text-white hover:from-[#e55a2b] hover:to-[#e08912]'
                                 : post.authorType === 'notice'
                                 ? 'bg-gradient-to-r from-[#e74c3c] to-[#c0392b] text-white hover:from-[#d62c1a] hover:to-[#a93226]'
                                 : 'bg-[#00d8e8] text-white hover:bg-[#00c4d4]'

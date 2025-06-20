@@ -182,7 +182,7 @@ export const getBadgeInfo = (authorType: AuthorType) => {
       return {
         text: 'MD INSIGHT',
         icon: '👑',
-        gradient: 'from-[#ff6b35] to-[#f7931e]'
+        gradient: 'from-[#6a11cb] to-[#2575fc]'
       }
     case 'notice':
       return {
@@ -193,7 +193,7 @@ export const getBadgeInfo = (authorType: AuthorType) => {
     case 'general':
     default:
       return {
-        text: 'ARTICLE',
+        text: 'GENERAL',
         icon: '📝',
         gradient: 'from-[#00d8e8] to-[#00c4d4]'
       }
