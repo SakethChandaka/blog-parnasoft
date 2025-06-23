@@ -22,9 +22,14 @@ async function makeRequest(endpoint: string, options: RequestInit = {}) {
   return response.json()
 }
 
-export async function GET(request: NextRequest, { params }: { params: { slug: string } }) {
+// Fix the parameter typing here:
+export async function GET(
+  request: NextRequest, 
+  context: { params: Promise<{ slug: string }> }
+) {
   try {
-    const result = await makeRequest(`/posts/${encodeURIComponent(params.slug)}`)
+    const { slug } = await context.params
+    const result = await makeRequest(`/posts/${encodeURIComponent(slug)}`)
     return NextResponse.json(result)
   } catch (error) {
     console.error('Error fetching post:', error)
@@ -32,10 +37,14 @@ export async function GET(request: NextRequest, { params }: { params: { slug: st
   }
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { slug: string } }) {
+export async function PUT(
+  request: NextRequest, 
+  context: { params: Promise<{ slug: string }> }
+) {
   try {
+    const { slug } = await context.params
     const body = await request.json()
-    const result = await makeRequest(`/posts/${encodeURIComponent(params.slug)}`, {
+    const result = await makeRequest(`/posts/${encodeURIComponent(slug)}`, {
       method: 'PUT',
       body: JSON.stringify(body)
     })
@@ -47,9 +56,13 @@ export async function PUT(request: NextRequest, { params }: { params: { slug: st
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { slug: string } }) {
+export async function DELETE(
+  request: NextRequest, 
+  context: { params: Promise<{ slug: string }> }
+) {
   try {
-    await makeRequest(`/posts/${encodeURIComponent(params.slug)}`, {
+    const { slug } = await context.params
+    await makeRequest(`/posts/${encodeURIComponent(slug)}`, {
       method: 'DELETE'
     })
     
