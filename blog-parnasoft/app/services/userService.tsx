@@ -1,20 +1,19 @@
 // services/userService.tsx - Fixed version
 import { User, CreateUserRequest, UpdateUserRequest, UserType } from '../types/user'
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || ''
-const API_KEY = process.env.NEXT_PUBLIC_FUNCTION_KEY || ''
-
 class UserService {
+  // Remove this:
+  // const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || ''
+  // const API_KEY = process.env.NEXT_PUBLIC_FUNCTION_KEY || ''
+
   private async makeRequest<T>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
-    const url = `${API_BASE_URL}${endpoint}`
+    const url = `/api${endpoint}` // Now calls your Next.js API routes
     
-    // Properly type headers as Record<string, string>
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      'x-functions-key': API_KEY,
     }
 
     // Add any additional headers from options

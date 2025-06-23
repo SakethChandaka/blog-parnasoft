@@ -1,10 +1,6 @@
 // app/services/blogService.ts
 import { BlogPost, UserType, AuthorType, Visibility } from '../types/blog'
 
-// Configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || ''
-const API_KEY = process.env.NEXT_PUBLIC_FUNCTION_KEY || ''
-
 // API response error handling
 class APIError extends Error {
   constructor(message: string, public status?: number) {
@@ -27,22 +23,33 @@ const handleResponse = async (response: Response) => {
   return response.text()
 }
 
-// Helper function to make API calls
-const apiCall = async (endpoint: string, options: RequestInit = {}) => {
-  const url = `${API_BASE_URL}${endpoint}`
-  
-  const defaultOptions: RequestInit = {
-    headers: {
-      'Content-Type': 'application/json',
-      'x-functions-key': API_KEY, // Add the API key here
-      ...options.headers,
-    },
-    ...options,
-  }
+// Remove this entire section:
+// const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || ''
+// const API_KEY = process.env.NEXT_PUBLIC_FUNCTION_KEY || ''
 
+// Replace makeRequest function with:
+const apiCall = async (endpoint: string, options: RequestInit = {}) => {
+  const url = `/api${endpoint}` // Now calls your Next.js API routes
+  
   try {
-    const response = await fetch(url, defaultOptions)
-    return await handleResponse(response)
+    const response = await fetch(url, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+      ...options,
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new APIError(errorText || `HTTP ${response.status}`, response.status)
+    }
+    
+    const contentType = response.headers.get('content-type')
+    if (contentType?.includes('application/json')) {
+      return response.json()
+    }
+    return response.text()
   } catch (error) {
     if (error instanceof APIError) {
       throw error

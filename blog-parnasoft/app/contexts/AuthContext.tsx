@@ -84,11 +84,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const validateToken = async (token: string): Promise<boolean> => {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/validate`, {
+      const response = await fetch('/api/auth/validate', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
-          'x-functions-key': API_KEY,
         },
       })
 
@@ -101,11 +100,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const refreshAccessToken = async (refreshToken: string): Promise<boolean> => {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
+      const response = await fetch('/api/auth/refresh', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-functions-key': API_KEY,
         },
         body: JSON.stringify({ refreshToken }),
       })
@@ -138,15 +136,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+    const login = async (email: string, password: string): Promise<boolean> => {
     try {
       setLoading(true)
       
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-functions-key': API_KEY,
         },
         body: JSON.stringify({ email, password }),
       })
@@ -198,11 +195,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
       
       if (refreshToken) {
         // Call logout endpoint to revoke refresh token
-        await fetch(`${API_BASE_URL}/auth/logout`, {
+        await fetch('/api/auth/logout', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'x-functions-key': API_KEY,
           },
           body: JSON.stringify({ refreshToken }),
         })
