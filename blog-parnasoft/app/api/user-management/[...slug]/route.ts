@@ -26,9 +26,14 @@ async function makeRequest(endpoint: string, options: RequestInit = {}) {
   return response.json()
 }
 
-export async function GET(request: NextRequest, { params }: { params: { slug: string[] } }) {
+// Fix parameter typing:
+export async function GET(
+  request: NextRequest, 
+  context: { params: Promise<{ slug: string[] }> }
+) {
   try {
-    const endpoint = `/user-management/${params.slug.join('/')}`
+    const { slug } = await context.params
+    const endpoint = `/user-management/${slug.join('/')}`
     const result = await makeRequest(endpoint)
     return NextResponse.json(result)
   } catch (error) {
@@ -37,10 +42,14 @@ export async function GET(request: NextRequest, { params }: { params: { slug: st
   }
 }
 
-export async function POST(request: NextRequest, { params }: { params: { slug: string[] } }) {
+export async function POST(
+  request: NextRequest, 
+  context: { params: Promise<{ slug: string[] }> }
+) {
   try {
+    const { slug } = await context.params
     const body = await request.json()
-    const endpoint = `/user-management/${params.slug.join('/')}`
+    const endpoint = `/user-management/${slug.join('/')}`
     const result = await makeRequest(endpoint, {
       method: 'POST',
       body: JSON.stringify(body)
@@ -53,10 +62,14 @@ export async function POST(request: NextRequest, { params }: { params: { slug: s
   }
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { slug: string[] } }) {
+export async function PUT(
+  request: NextRequest, 
+  context: { params: Promise<{ slug: string[] }> }
+) {
   try {
+    const { slug } = await context.params
     const body = await request.json()
-    const endpoint = `/user-management/${params.slug.join('/')}`
+    const endpoint = `/user-management/${slug.join('/')}`
     const result = await makeRequest(endpoint, {
       method: 'PUT',
       body: JSON.stringify(body)
@@ -69,9 +82,13 @@ export async function PUT(request: NextRequest, { params }: { params: { slug: st
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { slug: string[] } }) {
+export async function DELETE(
+  request: NextRequest, 
+  context: { params: Promise<{ slug: string[] }> }
+) {
   try {
-    const endpoint = `/user-management/${params.slug.join('/')}`
+    const { slug } = await context.params
+    const endpoint = `/user-management/${slug.join('/')}`
     await makeRequest(endpoint, { method: 'DELETE' })
     
     return NextResponse.json({ success: true })
