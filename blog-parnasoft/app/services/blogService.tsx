@@ -2,8 +2,8 @@
 import { BlogPost, UserType, AuthorType, Visibility } from '../types/blog'
 
 // Configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || ''
-const API_KEY = process.env.NEXT_PUBLIC_FUNCTION_KEY || ''
+const API_BASE_URL = process.env.API_BASE_URL || ''
+const API_KEY = process.env.FUNCTION_KEY || ''
 
 // API response error handling
 class APIError extends Error {
@@ -135,6 +135,14 @@ export const blogService = {
   // Update an existing post (admin only)
   updatePost: async (post: BlogPost): Promise<BlogPost> => {
     return apiCall(`/posts/${encodeURIComponent(post.slug)}`, {
+      method: 'PUT',
+      body: JSON.stringify(post)
+    })
+  },
+
+ // Alternative approach: Update post by ID if your backend supports it
+  updatePostById: async (post: BlogPost): Promise<BlogPost> => {
+    return apiCall(`/posts/id/${post.id}`, {
       method: 'PUT',
       body: JSON.stringify(post)
     })

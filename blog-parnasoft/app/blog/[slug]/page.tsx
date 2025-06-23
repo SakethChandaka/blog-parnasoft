@@ -18,6 +18,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
   const [post, setPost] = useState<BlogPost | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [currentUrl, setCurrentUrl] = useState('')
   const router = useRouter()
 
   // Get user type from auth context
@@ -26,6 +27,11 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
 
   // Unwrap the params Promise using React.use()
   const resolvedParams = use(params)
+  
+  // Add this useEffect to safely get the current URL
+  useEffect(() => {
+    setCurrentUrl(window.location.href)
+  }, [])
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -167,8 +173,9 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
         }
         
         .article-content li {
-          font-size: 1.125rem !important;
+          font-size: 1.0rem !important;
           line-height: 1.7 !important;
+          font-weight: 500;
           color: #1e3a4b !important;
           margin-bottom: 0.5rem !important;
           display: list-item !important;
@@ -261,7 +268,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
           {/* Author and Date */}
           <div className="border-l-4 border-[#00d8e8] pl-4 mb-6">
             <p className="text-[#1e3a4b] font-semibold mb-1">
-              <span className="text-[#00d8e8] font-bold">AUTHOR:</span> {post.author}
+              <span className="text-[#00d8e8] font-bold">BY:</span> {post.author}
             </p>
             <p className="text-[#1e3a4b] font-semibold">
               <span className="text-[#00d8e8] font-bold">PUBLISHED:</span> {new Date(post.publishedAt).toLocaleDateString('en-US', { 
@@ -309,11 +316,34 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
         <div className="border-t border-gray-200 pt-8 mb-12">
           <h3 className="text-lg font-semibold text-[#1e3a4b] mb-4">Share this article</h3>
           <div className="flex gap-4">
-            <button className="flex items-center gap-2 px-4 py-2 bg-[#00d8e8] text-white rounded-lg hover:bg-[#00c4d4] transition-colors duration-200">
+            <button
+              onClick={() => {
+                const url = encodeURIComponent(currentUrl)
+                const title = encodeURIComponent(post.title)
+                const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}&title=${title}`
+                window.open(linkedinUrl, '_blank', 'noopener,noreferrer')
+              }}
+              className="flex items-center gap-2 px-4 py-2 bg-[#00d8e8] text-white rounded-lg hover:bg-[#00c4d4] transition-colors duration-200"
+            >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
               </svg>
               Share on LinkedIn
+            </button>
+            
+            {/* Optional: Add more share buttons */}
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(currentUrl)
+                // You could add a toast notification here
+                alert('Link copied to clipboard!')
+              }}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors duration-200"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+              Copy Link
             </button>
           </div>
         </div>

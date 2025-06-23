@@ -6,8 +6,8 @@ import { User, AuthContextType } from '../types/auth'
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 // Configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || ''
-const API_KEY = process.env.NEXT_PUBLIC_FUNCTION_KEY || ''
+const API_BASE_URL = process.env.API_BASE_URL || ''
+const API_KEY = process.env.FUNCTION_KEY || ''
 
 interface AuthProviderProps {
   children: ReactNode
