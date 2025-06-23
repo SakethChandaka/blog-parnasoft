@@ -1,8 +1,8 @@
 // services/userService.tsx - Fixed version
 import { User, CreateUserRequest, UpdateUserRequest, UserType } from '../types/user'
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || ''
-const API_KEY = process.env.NEXT_PUBLIC_FUNCTION_KEY || ''
+const API_BASE_URL = process.env.API_BASE_URL || ''
+const API_KEY = process.env.FUNCTION_KEY || ''
 
 class UserService {
   private async makeRequest<T>(

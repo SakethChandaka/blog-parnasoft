@@ -730,7 +730,7 @@ function PostModal({ isOpen, onClose, post, onSave }: PostModalProps) {
       }
 
       if (post) {
-        await blogService.updatePost({ ...post, ...postData } as BlogPost)
+        await blogService.updatePostById({ ...post, ...postData } as BlogPost)
       } else {
         await blogService.createPost(postData as Omit<BlogPost, 'id' | 'publishedAt'>)
       }
