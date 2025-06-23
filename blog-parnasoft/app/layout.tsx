@@ -4,6 +4,8 @@ import { Montserrat } from 'next/font/google'
 import './globals.css'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { useState } from 'react'
+import { usePathname } from 'next/navigation';
+
 
 const montserrat = Montserrat({ 
   subsets: ['latin'],
@@ -15,6 +17,7 @@ const montserrat = Montserrat({
 function Navigation() {
   const { user, logout, loading } = useAuth()
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+  const pathname = usePathname();
   
   // Default to anonymous if no user or still loading
   const userType = user?.userType || 'anonymous'
@@ -47,7 +50,7 @@ function Navigation() {
           {/* Navigation Links */}
           <div className="flex items-center space-x-4">
             {/* Login Button - Only visible for anonymous users */}
-            {userType === 'anonymous' && !loading && (
+            {userType === 'anonymous' && !loading && pathname !== '/login'&& (
               <a
                 href="/login"
                 className="inline-flex items-center px-2 py-2 bg-gradient-to-r from-[#00d8e8] to-[#00c4d4] text-white text-xs md:text-sm lg:text-base font-semibold rounded-lg hover:from-[#00c4d4] hover:to-[#00b8c8] transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
@@ -233,6 +236,7 @@ export default function RootLayout({
     <html lang="en" className="scroll-smooth">
       <head>
         <link rel="icon" type="image/png" href="/blue-white.png" />
+        <title>Parnasoft Blog</title>
       </head>
       <body className={`${montserrat.className} ${montserrat.variable} antialiased bg-white min-h-screen`}>
         <AuthProvider>
