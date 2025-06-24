@@ -147,7 +147,7 @@ export const blogService = {
     })
   },
 
- // Alternative approach: Update post by ID if your backend supports it
+ // Alternative approach: Update post by ID 
   updatePostById: async (post: BlogPost): Promise<BlogPost> => {
     return apiCall(`/posts/id/${post.id}`, {
       method: 'PUT',
