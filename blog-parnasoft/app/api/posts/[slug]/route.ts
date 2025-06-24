@@ -1,3 +1,4 @@
+//slug route - app/api/posts/[slug]/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 
 const API_BASE_URL = process.env.API_BASE_URL
@@ -44,6 +45,7 @@ export async function PUT(
   try {
     const { slug } = await context.params
     const body = await request.json()
+    console.log(`/posts/${encodeURIComponent(slug)}`)
     const result = await makeRequest(`/posts/${encodeURIComponent(slug)}`, {
       method: 'PUT',
       body: JSON.stringify(body)

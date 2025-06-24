@@ -119,14 +119,40 @@ export default function BlogPage() {
         ref={(el) => { cardRefs.current[index] = el }}
         className={`relative group rounded-2xl bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300 border-2 mb-6 ${
           post.authorType === 'md' 
-            ? 'border-orange-300 hover:border-orange-400' 
-            : 'border-red-300 hover:border-red-400'
+            ? 'border-[#6a11cb] hover:border-[#2575fc]' 
+            : post.authorType === 'notice'
+            ? 'border-[#e74c3c] hover:border-[#c0392b]'
+            : 'border-[#00d8e8] hover:border-[#00c4d4]'
         }`}
         style={{ animationDelay: `${0.1 + index * 0.1}s` }}
         onMouseEnter={() => setHoveredCard(index)}
         onMouseLeave={() => setHoveredCard(null)}
         onMouseMove={(e) => handleMouseMove(e, index)}
       >
+        {/* Special glow effect for MD posts */}
+        {post.authorType === 'md' && (
+          <div className="absolute inset-0 bg-gradient-to-r from-[#6a11cb]/5 to-[#2575fc]/9 pointer-events-none z-0" />
+        )}
+
+        {/* Special urgent effect for notice posts */}
+        {post.authorType === 'notice' && (
+          <div className="absolute inset-0 bg-gradient-to-r from-[#e74c3c]/5 to-[#c0392b]/9 pointer-events-none z-0" />
+        )}
+
+        {/* Special effect for general posts */}
+        {post.authorType === 'general' && (
+          <div className="absolute inset-0 bg-gradient-to-r from-[#00d8e8]/5 to-[#00c4d4]/9 pointer-events-none z-0" />
+        )}
+
+        {/* Special effect for internal/restricted posts */}
+        {post.visibility === 'internal' && (
+          <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/2 to-yellow-500/9 pointer-events-none z-0" />
+        )}
+
+        {post.visibility === 'restricted' && (
+          <div className="absolute inset-0 bg-gradient-to-r from-red-400/2 to-red-500/5 pointer-events-none z-0" />
+        )}
+
         {/* Badge */}
         <div className="absolute top-4 left-4 z-20">
           <span className={`px-3 py-1 bg-gradient-to-r ${badgeInfo.gradient} text-white text-xs font-bold rounded-full shadow-lg flex items-center gap-1`}>
@@ -149,7 +175,11 @@ export default function BlogPage() {
         <div className="relative z-10 p-6">
           <div className="mb-4 mt-6">
             <h2 className={`text-xl lg:text-2xl font-bold mb-3 ${
-              post.authorType === 'md' ? 'text-orange-800 group-hover:text-orange-600' : 'text-red-800 group-hover:text-red-600'
+              post.authorType === 'md' 
+                ? 'text-[#6a11cb] group-hover:text-[#2575fc]' 
+                : post.authorType === 'notice'
+                ? 'text-[#e74c3c] group-hover:text-[#c0392b]'
+                : 'text-[#00d8e8] group-hover:text-[#00c4d4]'
             } transition-colors duration-300`}>
               {post.title}
             </h2>
@@ -157,15 +187,19 @@ export default function BlogPage() {
             <div className="flex flex-wrap items-center gap-3 mb-3">
               <span className={`px-3 py-1 text-sm font-semibold rounded-full ${
                 post.authorType === 'md' 
-                  ? 'bg-orange-100 text-orange-800' 
-                  : 'bg-red-100 text-red-800'
+                  ? 'bg-[#6a11cb]/10 text-[#6a11cb]' 
+                  : post.authorType === 'notice'
+                  ? 'bg-[#e74c3c]/10 text-[#e74c3c]'
+                  : 'bg-[#00d8e8]/10 text-[#00d8e8]'
               }`}>
                 {post.category}
               </span>
               <span className={`px-3 py-1 text-sm font-semibold rounded-full ${
                 post.authorType === 'md' 
-                  ? 'bg-orange-100 text-orange-800' 
-                  : 'bg-red-100 text-red-800'
+                  ? 'bg-[#6a11cb]/10 text-[#6a11cb]' 
+                  : post.authorType === 'notice'
+                  ? 'bg-[#e74c3c]/10 text-[#e74c3c]'
+                  : 'bg-[#00d8e8]/10 text-[#00d8e8]'
               }`}>
                 {post.readTime}
               </span>
@@ -175,12 +209,20 @@ export default function BlogPage() {
           <div className="mb-4">
             <div className="mb-3">
               <p className={`text-sm font-semibold ${
-                post.authorType === 'md' ? 'text-orange-700' : 'text-red-700'
+                post.authorType === 'md' 
+                  ? 'text-[#6a11cb]' 
+                  : post.authorType === 'notice'
+                  ? 'text-[#e74c3c]'
+                  : 'text-[#00d8e8]'
               }`}>
                 <span className="font-bold">BY &gt;</span> {post.author}
               </p>
               <p className={`text-sm font-semibold ${
-                post.authorType === 'md' ? 'text-orange-700' : 'text-red-700'
+                post.authorType === 'md' 
+                  ? 'text-[#6a11cb]' 
+                  : post.authorType === 'notice'
+                  ? 'text-[#e74c3c]'
+                  : 'text-[#00d8e8]'
               }`}>
                 <span className="font-bold">PUBLISHED &gt;</span> {new Date(post.publishedAt).toLocaleDateString('en-US', { 
                   year: 'numeric', 
@@ -192,7 +234,11 @@ export default function BlogPage() {
 
             <div className="mb-4">
               {/*<p className={`font-semibold text-sm leading-relaxed ${
-                post.authorType === 'md' ? 'text-orange-800' : 'text-red-800'
+                post.authorType === 'md' 
+                  ? 'text-[#6a11cb]' 
+                  : post.authorType === 'notice'
+                  ? 'text-[#e74c3c]'
+                  : 'text-[#00d8e8]'
               }`}>
                 {post.excerpt}
               </p>*/}
@@ -201,11 +247,13 @@ export default function BlogPage() {
             <div className="flex justify-start">
               <button 
                 onClick={() => handleReadMore(post.slug)}
-                className={`inline-flex items-center px-5 py-2 font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl group ${
+                className={`inline-flex items-center px-5 py-2 font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl group bg-gradient-to-r ${
                   post.authorType === 'md'
-                    ? 'bg-orange-500 text-white hover:bg-orange-600'
-                    : 'bg-red-500 text-white hover:bg-red-600'
-                }`}
+                    ? 'from-[#6a11cb] to-[#2575fc] hover:from-[#5a0eb8] hover:to-[#1f68e8]'
+                    : post.authorType === 'notice'
+                    ? 'from-[#e74c3c] to-[#c0392b] hover:from-[#d63427] hover:to-[#a93226]'
+                    : 'from-[#00d8e8] to-[#00c4d4] hover:from-[#00c2d1] hover:to-[#00b0bc]'
+                } text-white`}
               >
                 {post.authorType === 'notice' ? 'Read Notice' : 'Read More'}
                 <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
