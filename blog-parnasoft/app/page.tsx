@@ -112,6 +112,7 @@ export default function BlogPage() {
   // Render card for important posts
   const renderImportantCard = (post: BlogPost, index: number) => {
     const badgeInfo = getBadgeInfo(post.authorType)
+    const visibilityBadge = getVisibilityBadge(post.visibility)
     
     return (
       <div
@@ -154,10 +155,13 @@ export default function BlogPage() {
         )}
 
         {/* Badge */}
-        <div className="absolute top-4 left-4 z-20">
+        <div className="absolute w-full top-4 z-20 px-6 flex flex-row gap-2 justify-start">
           <span className={`px-3 py-1 bg-gradient-to-r ${badgeInfo.gradient} text-white text-xs font-bold rounded-full shadow-lg flex items-center gap-1`}>
             <span className="text-sm">{badgeInfo.icon}</span>
             {badgeInfo.text}
+          </span>
+          <span className={`flex px-3 py-1 text-xs font-bold text-center items-center rounded-full border ${visibilityBadge.className}`}>
+            {visibilityBadge.text}
           </span>
         </div>
 
