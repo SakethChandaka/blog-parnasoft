@@ -244,7 +244,7 @@ export default function RootLayout({
           <Navigation />
 
           {/* Main Content */}
-          <main className="pt-20 mb-10">
+          <main className="pt-20">
             {children}
           </main>
 
