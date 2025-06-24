@@ -379,7 +379,7 @@ export default function BlogPage() {
                 </p>
                 
                 {/* User Access Level Indicator (for development) */}
-                {process.env.NODE_ENV === 'production' && (
+                {process.env.NODE_ENV === 'development' && (
                   <div className="inline-block bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg px-3 py-2 mb-6">
                     <p className="text-sm text-white">
                       <strong>Access:</strong> {userType} • <strong>Posts:</strong> {blogPosts.length}
