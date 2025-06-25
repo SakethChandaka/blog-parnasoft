@@ -19,6 +19,8 @@ export default function BlogPage() {
   const [error, setError] = useState<string | null>(null)
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
   const router = useRouter()
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [currentImportantIndex, setCurrentImportantIndex] = useState(0)
 
   // Get user type from auth context
   const { user } = useAuth()
@@ -105,9 +107,55 @@ export default function BlogPage() {
     }
   }
 
+  
+
   // Separate posts into important and general
   const importantPosts = blogPosts.filter(post => post.authorType === 'md' || post.authorType === 'notice')
   const generalPosts = blogPosts.filter(post => post.authorType !== 'md' && post.authorType !== 'notice')
+
+  const goToNext = () => {
+    if (currentIndex < generalPosts.length - 1) {
+      setCurrentIndex(currentIndex + 1)
+    }
+  }
+
+  const goToPrevious = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1)
+    }
+  }
+
+  const goToIndex = (index: number) => {
+    setCurrentIndex(index)
+  }
+
+  useEffect(() => {
+    // Reset to first card when posts change
+    if (generalPosts.length > 0 && currentIndex >= generalPosts.length) {
+      setCurrentIndex(0)
+    }
+  }, [generalPosts.length, currentIndex])
+
+  // Navigation functions for important posts
+  const goToNextImportant = () => {
+    if (currentImportantIndex < importantPosts.length - 1) {
+      setCurrentImportantIndex(currentImportantIndex + 1)
+    }
+  }
+
+  const goToPreviousImportant = () => {
+    if (currentImportantIndex > 0) {
+      setCurrentImportantIndex(currentImportantIndex - 1)
+    }
+  }
+
+  // Add this useEffect for important posts
+  useEffect(() => {
+    // Reset to first card when posts change
+    if (importantPosts.length > 0 && currentImportantIndex >= importantPosts.length) {
+      setCurrentImportantIndex(0)
+    }
+  }, [importantPosts.length, currentImportantIndex])
 
   // Render card for important posts
   const renderImportantCard = (post: BlogPost, index: number) => {
@@ -118,7 +166,7 @@ export default function BlogPage() {
       <div
         key={post.id}
         ref={(el) => { cardRefs.current[index] = el }}
-        className={`relative group rounded-2xl bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300 border-2 mb-6 ${
+        className={`relative group rounded-2xl bg-white/90 backdrop-blur-sm shadow-lg transition-all duration-300 border-2 mb-6 ${
           post.authorType === 'md' 
             ? 'border-[#6a11cb] hover:border-[#2575fc]' 
             : post.authorType === 'notice'
@@ -171,7 +219,7 @@ export default function BlogPage() {
           style={{
             opacity: hoveredCard === index ? 1 : 0,
             background: hoveredCard === index
-              ? `radial-gradient(600px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(255, 143, 90, 0.1), transparent 40%)`
+              ? `radial-gradient(75px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(240, 72, 255, 0.1), transparent 100%)`
               : "",
           }}
         />
@@ -251,7 +299,7 @@ export default function BlogPage() {
             <div className="flex justify-start">
               <button 
                 onClick={() => handleReadMore(post.slug)}
-                className={`inline-flex items-center px-5 py-2 font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl group bg-gradient-to-r ${
+                className={`inline-flex items-center px-5 py-2 font-semibold rounded-lg transition-all duration-200 shadow-lg hover:scale-105 hover:shadow-xl group bg-gradient-to-r ${
                   post.authorType === 'md'
                     ? 'from-[#6a11cb] to-[#2575fc] hover:from-[#5a0eb8] hover:to-[#1f68e8]'
                     : post.authorType === 'notice'
@@ -280,8 +328,8 @@ export default function BlogPage() {
       <div
         key={post.id}
         ref={(el) => { cardRefs.current[index + importantPosts.length] = el }}
-        className={`relative group overflow-hidden rounded-2xl bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-500 transform  border border-[#00d8e8] mb-6 ${
-          hoveredCard === index + importantPosts.length ? 'border border-[#00d8e8]' : 'border border-[#00d8e8]'
+        className={`relative group overflow-hidden rounded-2xl bg-white/90 backdrop-blur-sm shadow-lg transition-all duration-500 transform border-2 border-[#00BACC] mb-6 ${
+          hoveredCard === index + importantPosts.length ? 'border-2 border-[#007F8C]' : 'border-2 border-[#008A9E]'
         }`}
         style={{ animationDelay: `${0.1 + index * 0.1}s` }}
         onMouseEnter={() => setHoveredCard(index + importantPosts.length)}
@@ -306,14 +354,14 @@ export default function BlogPage() {
           style={{
             opacity: hoveredCard === index + importantPosts.length ? 1 : 0,
             background: hoveredCard === index + importantPosts.length
-              ? `radial-gradient(600px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(0, 216, 232, 0.1), transparent 40%)`
+              ? `radial-gradient(75px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(0, 216, 232, 0.1), transparent 100%)`
               : "",
           }}
         />
 
         <div className="relative z-10 p-6">
           <div className="mb-4 mt-6">
-            <h2 className="text-xl lg:text-2xl font-bold text-[#1e3a4b] mb-3 group-hover:text-[#00d8e8] transition-colors duration-300">
+            <h2 className="text-xl lg:text-2xl font-bold text-[#1e3a4b] mb-3 group-hover:text-green-700 transition-colors duration-300">
               {post.title}
             </h2>
             <div className="flex flex-wrap items-center gap-3 mb-3">
@@ -530,21 +578,21 @@ export default function BlogPage() {
           }}
         >
           {/* Content Container */}
-          <div className="relative h-full flex flex-col pb-5 pl-5">
+          <div className="relative h-full flex flex-col pb-5">
             {/* Header Section */}
-            <div className="p-6 xl:p-10">
+            <div className="p-4 pt-6 pl-8 xl:p-10 flex">
               <div className="max-w-2xl">
                 <h1 className="text-4xl xl:text-5xl font-bold text-white mb-4 leading-tight">
                   Important
                   <br />
                   Updates
                 </h1>
-                <p className="text-l text-white/90 font-medium mb-6">
-                  Critical announcements and insights from our <br/>leadership team
+                <p className="text-sm text-white/90 font-medium mb-6">
+                  Critical announcements and insights from our leadership team
                 </p>
                 
                 {/* User Access Level Indicator (for development) */}
-                {process.env.NODE_ENV === 'development' && (
+                {process.env.NODE_ENV === 'test' && (
                   <div className="inline-block bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg px-3 py-2 mb-6">
                     <p className="text-sm text-white">
                       <strong>Access:</strong> {userType} • <strong>Posts:</strong> {blogPosts.length}
@@ -555,32 +603,89 @@ export default function BlogPage() {
               </div>
             </div>
 
-            {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto px-8 lg:px-12 pb-8">
-              <div className="flex flex-col justify-top sm:w-full max-w-sm space-y-1 ml-[10px] xl:ml-[100px]">
+            <div className="flex-1 px-8 lg:px-12 pb-8 flex justify-start p-4 relative">
+              {/* Center highlight indicator for important posts */}
+              <div className="absolute left-8 lg:left-12 top-1/2 transform -translate-y-1/2 w-1 h-32 bg-white/30 rounded-full z-10 pointer-events-none">
+                <div className="w-2 h-8 bg-white rounded-full transform -translate-x-0.5 transition-all duration-300"
+                    style={{
+                      transform: `translateY(${(currentImportantIndex / Math.max(importantPosts.length - 1, 1)) * 96}px)`
+                    }}
+                />
+              </div>
+
+              {/* Card Container with Navigation - NO SCROLL */}
+              <div className="flex flex-col sm:w-full max-w-sm ml-[10px] xl:ml-[100px] relative h-full overflow-hidden">
                 {importantPosts.length === 0 ? (
-                  <div className="text-center py-8 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
-                    <div className="text-white/70 text-4xl mb-3">📋</div>
-                    <p className="text-white/90 font-medium">No important updates available</p>
+                  <div className="text-center py-12 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 h-full flex flex-col justify-center items-center">
+                    <div className="text-white/70 text-6xl mb-4">📋</div>
+                    <h3 className="text-white font-semibold text-xl mb-2">No Important Updates Available</h3>
+                    <p className="text-white/90">Critical announcements will appear here when published</p>
                   </div>
                 ) : (
-                  importantPosts
-                    .slice()
-                    .reverse()
-                    .map((post, index) => (
-                      <div
-                        key={post.id}
-                        className="animate-slide-in-left"
-                        style={{ 
-                          animationDelay: `${index * 0.1}s`,
-                          transform: 'translateY(30px)',
-                          opacity: 0,
-                          animation: `slideInUp 0.6s ease-out ${index * 0.1}s forwards`
-                        }}
-                      >
-                        {renderImportantCard(post, index)}
+                  <div className="h-full flex flex-col pt-1">
+                    {/* Navigation Buttons - Both at top, side by side */}
+                    {importantPosts.length > 1 && (
+                      <div className="flex justify-center gap-4 mb-4">
+                        {/* Up Arrow Button */}
+                        <button
+                          onClick={goToPreviousImportant}
+                          disabled={currentImportantIndex === 0}
+                          className={`w-8 h-8 rounded-full border-2 transition-all duration-300 flex items-center justify-center ${
+                            currentImportantIndex === 0
+                              ? 'bg-white/10 border-white/20 text-white/30 cursor-not-allowed'
+                              : 'bg-white/20 border-white/40 text-white hover:bg-white/30 hover:border-white/60 hover:scale-110'
+                          }`}
+                          aria-label="Previous important update"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                          </svg>
+                        </button>
+
+                        {/* Down Arrow Button */}
+                        <button
+                          onClick={goToNextImportant}
+                          disabled={currentImportantIndex === importantPosts.length - 1}
+                          className={`w-8 h-8 rounded-full border-2 transition-all duration-300 flex items-center justify-center ${
+                            currentImportantIndex === importantPosts.length - 1
+                              ? 'bg-white/10 border-white/20 text-white/30 cursor-not-allowed'
+                              : 'bg-white/20 border-white/40 text-white hover:bg-white/30 hover:border-white/60 hover:scale-110'
+                          }`}
+                          aria-label="Next important update"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </button>
                       </div>
-                    ))
+                    )}
+
+                    {/* Cards Container */}
+                    <div className="flex-1 flex items-start justify-center relative">
+                      {importantPosts.map((post, index) => (
+                        <div
+                          key={post.id}
+                          className="absolute top-0 left-0 right-0 flex justify-center transition-all duration-500 ease-out"
+                          style={{
+                            transform: `translateY(${
+                              index === currentImportantIndex ? '0px' :
+                              index < currentImportantIndex ? '-20px' : '20px'
+                            }) scale(${
+                              index === currentImportantIndex ? '1.0' : '0.85'
+                            })`,
+                            opacity: index === currentImportantIndex ? 1 : 0,
+                            zIndex: index === currentImportantIndex ? 20 : 0,
+                            filter: index === currentImportantIndex ? 'none' : 'blur(2px)',
+                            pointerEvents: index === currentImportantIndex ? 'auto' : 'none'
+                          }}
+                        >
+                          <div className="w-full max-h-full overflow-y-auto">
+                            {renderImportantCard(post, index)}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
@@ -597,49 +702,109 @@ export default function BlogPage() {
           {/* Content Container */}
           <div className="relative h-full flex flex-col pb-5 mb-5">
             {/* Header Section */}
-            <div className="p-6 xl:p-10 flex justify-end">
+            <div className="p-4 pt-6 pr-8 xl:p-10 flex justify-end">
               <div className="max-w-2xl text-right">
                 <h1 className="text-4xl xl:text-5xl font-bold text-white mb-4 leading-tight">
                   Latest
                   <br />
                   Articles
                 </h1>
-                <p className="text-l text-white/90 font-medium mb-6">
+                <p className="text-sm text-white/90 font-medium mb-6">
                   Explore insights and innovations at Parnasoft
                 </p>
               </div>
             </div>
 
-            {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto px-8 lg:px-12 pb-8 flex justify-end p-4">
-              <div className="flex flex-col justify-top sm:w-full max-w-sm space-y-1 mr-[10px] xl:mr-[100px]">
+            <div className="flex-1 px-8 lg:px-12 pb-8 flex justify-end p-4 relative">
+              {/* Center highlight indicator - Keep outside for proper positioning */}
+              <div className="absolute right-8 lg:right-12 top-1/2 transform -translate-y-1/2 w-1 h-32 bg-white/30 rounded-full z-10 pointer-events-none">
+                <div className="w-2 h-8 bg-white rounded-full transform -translate-x-0.5 transition-all duration-300"
+                    style={{
+                      transform: `translateY(${(currentIndex / Math.max(generalPosts.length - 1, 1)) * 96}px)`
+                    }}
+                />
+              </div>
+
+              {/* Card Container with Navigation - NO SCROLL */}
+              <div className="flex flex-col sm:w-full max-w-sm mr-[10px] xl:mr-[100px] relative h-full overflow-hidden">
                 {generalPosts.length === 0 ? (
-                  <div className="text-center py-12 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20">
+                  <div className="text-center py-12 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 h-full flex flex-col justify-center items-center">
                     <div className="text-white/70 text-6xl mb-4">📝</div>
                     <h3 className="text-white font-semibold text-xl mb-2">No Articles Available</h3>
                     <p className="text-white/90">New content will appear here when published</p>
                   </div>
                 ) : (
-                  generalPosts.map((post, index) => (
-                    <div
-                      key={post.id}
-                      className="animate-slide-in-right"
-                      style={{ 
-                        animationDelay: `${index * 0.15}s`,
-                        transform: 'translateY(30px)',
-                        opacity: 0,
-                        animation: `slideInUp 0.6s ease-out ${index * 0.15}s forwards`
-                      }}
-                    >
-                      {renderGeneralCard(post, index)}
+                  <div className="h-full flex flex-col pt-1">
+                    {/* Navigation Buttons - Both at top, side by side */}
+                    {generalPosts.length > 1 && (
+                      <div className="flex justify-center gap-4 mb-4">
+                        {/* Up Arrow Button */}
+                        <button
+                          onClick={goToPrevious}
+                          disabled={currentIndex === 0}
+                          className={`w-8 h-8 rounded-full border-2 transition-all duration-300 flex items-center justify-center ${
+                            currentIndex === 0
+                              ? 'bg-white/10 border-white/20 text-white/30 cursor-not-allowed'
+                              : 'bg-white/20 border-white/40 text-white hover:bg-white/30 hover:border-white/60 hover:scale-110'
+                          }`}
+                          aria-label="Previous article"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                          </svg>
+                        </button>
+
+                        {/* Down Arrow Button */}
+                        <button
+                          onClick={goToNext}
+                          disabled={currentIndex === generalPosts.length - 1}
+                          className={`w-8 h-8 rounded-full border-2 transition-all duration-300 flex items-center justify-center ${
+                            currentIndex === generalPosts.length - 1
+                              ? 'bg-white/10 border-white/20 text-white/30 cursor-not-allowed'
+                              : 'bg-white/20 border-white/40 text-white hover:bg-white/30 hover:border-white/60 hover:scale-110'
+                          }`}
+                          aria-label="Next article"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Cards Container */}
+                    <div className="flex-1 flex items-start justify-center relative">
+                      {generalPosts.map((post, index) => (
+                        <div
+                          key={post.id}
+                          className="absolute top-0 left-0 right-0 flex justify-center transition-all duration-500 ease-out"
+                          style={{
+                            transform: `translateY(${
+                              index === currentIndex ? '0px' :
+                              index < currentIndex ? '-20px' : '20px'
+                            }) scale(${
+                              index === currentIndex ? '1.0' : '0.85'
+                            })`,
+                            opacity: index === currentIndex ? 1 : 0,
+                            zIndex: index === currentIndex ? 20 : 0,
+                            filter: index === currentIndex ? 'none' : 'blur(2px)',
+                            pointerEvents: index === currentIndex ? 'auto' : 'none'
+                          }}
+                        >
+                          <div className="w-full max-h-full overflow-y-auto">
+                            {renderGeneralCard(post, index)}
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  ))
+                  </div>
                 )}
               </div>
             </div>
           </div>
         </div>
       </div>
+
 
       {/* Custom Styles */}
       <style jsx global>{`
@@ -654,64 +819,36 @@ export default function BlogPage() {
           }
         }
         
-        /* Custom scrollbars */
-        ::-webkit-scrollbar {
-          width: 8px;
+        /* Smooth transitions for card navigation */
+        .card-container > div {
+          transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                      opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                      filter 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        ::-webkit-scrollbar-track {
+        
+        /* Custom scrollbar for individual cards only */
+        .card-content::-webkit-scrollbar {
+          width: 4px;
+        }
+        
+        .card-content::-webkit-scrollbar-track {
           background: rgba(255, 255, 255, 0.1);
-          border-radius: 4px;
+          border-radius: 2px;
         }
-        ::-webkit-scrollbar-thumb {
+        
+        .card-content::-webkit-scrollbar-thumb {
           background: rgba(255, 255, 255, 0.3);
-          border-radius: 4px;
+          border-radius: 2px;
         }
-        ::-webkit-scrollbar-thumb:hover {
+        
+        .card-content::-webkit-scrollbar-thumb:hover {
           background: rgba(255, 255, 255, 0.5);
         }
         
-        /* Smooth scrolling */
-        html {
-          scroll-behavior: smooth;
-        }
-        .scroll-fade-top {
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          height: 40px;
-          background: linear-gradient(to bottom, rgba(255, 255, 255, 0.8), transparent);
-          backdrop-filter: blur(8px);
-          z-index: 30;
-          pointer-events: none;
-        }
-
-        .scroll-fade-bottom {
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          height: 40px;
-          background: linear-gradient(to top, rgba(255, 255, 255, 0.8), transparent);
-          backdrop-filter: blur(8px);
-          z-index: 30;
-          pointer-events: none;
-        }
-
-        .scroll-fade-top-left {
-          background: linear-gradient(to bottom, rgba(255, 143, 90, 0.8), transparent);
-        }
-
-        .scroll-fade-bottom-left {
-          background: linear-gradient(to top, rgba(255, 143, 90, 0.8), transparent);
-        }
-
-        .scroll-fade-top-right {
-          background: linear-gradient(to bottom, rgba(0, 216, 232, 0.8), transparent);
-        }
-
-        .scroll-fade-bottom-right {
-          background: linear-gradient(to top, rgba(0, 216, 232, 0.8), transparent);
+        /* Disable text selection on navigation elements */
+        .navigation-button {
+          user-select: none;
+          -webkit-user-select: none;
         }
       `}</style>
     </div>
