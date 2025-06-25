@@ -605,13 +605,14 @@ export default function BlogPage() {
 
             <div className="flex-1 px-8 lg:px-12 pb-8 flex justify-start p-4 relative">
               {/* Center highlight indicator for important posts */}
+              {importantPosts.length > 1 && (
               <div className="absolute left-8 lg:left-12 top-1/2 transform -translate-y-1/2 w-1 h-32 bg-white/30 rounded-full z-10 pointer-events-none">
                 <div className="w-2 h-8 bg-white rounded-full transform -translate-x-0.5 transition-all duration-300"
                     style={{
                       transform: `translateY(${(currentImportantIndex / Math.max(importantPosts.length - 1, 1)) * 96}px)`
                     }}
                 />
-              </div>
+              </div>)}
 
               {/* Card Container with Navigation - NO SCROLL */}
               <div className="flex flex-col sm:w-full max-w-sm ml-[10px] xl:ml-[100px] relative h-full overflow-hidden">
@@ -624,12 +625,12 @@ export default function BlogPage() {
                 ) : (
                   <div className="h-full flex flex-col pt-1">
                     {/* Navigation Buttons - Both at top, side by side */}
-                    {importantPosts.length > 1 && (
+                    {importantPosts.length >= 1 && (
                       <div className="flex justify-center gap-4 mb-4">
                         {/* Up Arrow Button */}
                         <button
                           onClick={goToPreviousImportant}
-                          disabled={currentImportantIndex === 0}
+                          disabled={currentImportantIndex === 0 && importantPosts.length <= 1}
                           className={`w-8 h-8 rounded-full border-2 transition-all duration-300 flex items-center justify-center ${
                             currentImportantIndex === 0
                               ? 'bg-white/10 border-white/20 text-white/30 cursor-not-allowed'
@@ -717,13 +718,14 @@ export default function BlogPage() {
 
             <div className="flex-1 px-8 lg:px-12 pb-8 flex justify-end p-4 relative">
               {/* Center highlight indicator - Keep outside for proper positioning */}
+              {importantPosts.length > 1 && (
               <div className="absolute right-8 lg:right-12 top-1/2 transform -translate-y-1/2 w-1 h-32 bg-white/30 rounded-full z-10 pointer-events-none">
                 <div className="w-2 h-8 bg-white rounded-full transform -translate-x-0.5 transition-all duration-300"
                     style={{
                       transform: `translateY(${(currentIndex / Math.max(generalPosts.length - 1, 1)) * 96}px)`
                     }}
                 />
-              </div>
+              </div>)}
 
               {/* Card Container with Navigation - NO SCROLL */}
               <div className="flex flex-col sm:w-full max-w-sm mr-[10px] xl:mr-[100px] relative h-full overflow-hidden">
@@ -736,12 +738,12 @@ export default function BlogPage() {
                 ) : (
                   <div className="h-full flex flex-col pt-1">
                     {/* Navigation Buttons - Both at top, side by side */}
-                    {generalPosts.length > 1 && (
+                    {generalPosts.length >= 1 && (
                       <div className="flex justify-center gap-4 mb-4">
                         {/* Up Arrow Button */}
                         <button
                           onClick={goToPrevious}
-                          disabled={currentIndex === 0}
+                          disabled={currentIndex === 0 && generalPosts.length <= 1}
                           className={`w-8 h-8 rounded-full border-2 transition-all duration-300 flex items-center justify-center ${
                             currentIndex === 0
                               ? 'bg-white/10 border-white/20 text-white/30 cursor-not-allowed'
