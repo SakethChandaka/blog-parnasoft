@@ -718,7 +718,7 @@ export default function BlogPage() {
 
             <div className="flex-1 px-8 lg:px-12 pb-8 flex justify-end p-4 relative">
               {/* Center highlight indicator - Keep outside for proper positioning */}
-              {importantPosts.length > 1 && (
+              {generalPosts.length > 1 && (
               <div className="absolute right-8 lg:right-12 top-1/2 transform -translate-y-1/2 w-1 h-32 bg-white/30 rounded-full z-10 pointer-events-none">
                 <div className="w-2 h-8 bg-white rounded-full transform -translate-x-0.5 transition-all duration-300"
                     style={{
