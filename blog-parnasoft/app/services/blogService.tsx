@@ -130,7 +130,8 @@ export const blogService = {
       tags: postData.tags,
       readTime: postData.readTime,
       visibility: postData.visibility,
-      featured: postData.featured
+      featured: postData.featured,
+      sources: postData.sources
     }
 
     return apiCall('/posts', {
