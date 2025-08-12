@@ -19,6 +19,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [currentUrl, setCurrentUrl] = useState('')
+  const [showCreditsModal, setShowCreditsModal] = useState(false)
   const router = useRouter()
 
   // Get user type from auth context
@@ -80,6 +81,27 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
         return false
     }
   }
+
+  // Handle modal close on escape key
+  useEffect(() => {
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setShowCreditsModal(false)
+      }
+    }
+
+    if (showCreditsModal) {
+      document.addEventListener('keydown', handleEscapeKey)
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscapeKey)
+      document.body.style.overflow = 'unset'
+    }
+  }, [showCreditsModal])
 
   if (loading) {
     return (
@@ -313,7 +335,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
         </div>
 
         {/* Social Share */}
-        <div className="border-t border-gray-200 pt-8 mb-12">
+        <div className="border-t border-gray-200 pt-8 mb-8">
           <h3 className="text-lg font-semibold text-[#1e3a4b] mb-4">Share this article</h3>
           <div className="flex gap-4">
             <button
@@ -347,6 +369,177 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
             </button>
           </div>
         </div>
+
+        {/* Credits & Sources Section */}
+        <div className="border-t border-gray-200 pt-8 mb-12">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-[#1e3a4b]">Article Information</h3>
+            <button
+              onClick={() => setShowCreditsModal(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#00d8e8] to-[#00c4d4] text-white rounded-lg hover:from-[#00c4d4] hover:to-[#00b8c8] transition-all duration-200 shadow-md hover:shadow-lg"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              View Credits & Sources
+            </button>
+          </div>
+        </div>
       </article>
+
+      {/* Credits Modal */}
+      {showCreditsModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            {/* Background overlay */}
+            <div 
+              className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"
+              onClick={() => setShowCreditsModal(false)}
+            ></div>
+
+            {/* Modal content */}
+            <div className="relative inline-block px-4 pt-5 pb-4 overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full sm:p-6">
+              {/* Header */}
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-[#00d8e8] to-[#00c4d4] rounded-full">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <h2 className="text-2xl font-bold text-[#1e3a4b]">Credits & Sources</h2>
+                </div>
+                <button
+                  onClick={() => setShowCreditsModal(false)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Article Info */}
+              <div className="bg-gradient-to-r from-[#00d8e8]/5 to-[#00d8e8]/10 rounded-lg p-4 mb-6">
+                <h3 className="font-semibold text-[#1e3a4b] mb-2">{post.title}</h3>
+                <p className="text-sm text-gray-600">
+                  Published on {new Date(post.publishedAt).toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                  })}
+                </p>
+              </div>
+
+              {/* Credits Content */}
+              <div className="space-y-6">
+                {/* Author Section */}
+                <div>
+                  <h4 className="text-lg font-semibold text-[#1e3a4b] mb-3 flex items-center gap-2">
+                    <svg className="w-5 h-5 text-[#00d8e8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    Author
+                  </h4>
+                  <div className="pl-7">
+                    <p className="text-[#1e3a4b] font-medium">{post.author}</p>
+                    <p className="text-sm text-gray-600 mt-1">
+                      {post.authorType === 'md' ? 'Managing Director' : 
+                       post.authorType === 'notice' ? 'Official Notice' : 'Management'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Research & Sources Section */}
+                <div>
+                  <h4 className="text-lg font-semibold text-[#1e3a4b] mb-3 flex items-center gap-2">
+                    <svg className="w-5 h-5 text-[#00d8e8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    Sources & References
+                  </h4>
+                  <div className="pl-7 space-y-3">
+                    {/* You can add actual sources from your BlogPost type if they exist */}
+                    <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                      <p className="text-sm text-gray-600">
+                        This article is based on internal research, expert knowledge, and industry best practices. 
+                        All information has been reviewed for accuracy and compliance with current standards.
+                      </p>
+                    </div>
+                    
+                    {/* If you have sources in your BlogPost type, you can map over them */}
+                    {post.sources && post.sources.length > 0 ? (
+                      <ul className="space-y-2">
+                        {post.sources.map((source, index) => (
+                          <li key={index} className="text-sm text-[#1e3a4b] flex items-start gap-2">
+                            <span className="text-[#00d8e8] font-bold">{index + 1}.</span>
+                            {source.url ? (
+                              <a 
+                                href={source.url} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-[#00d8e8] hover:text-[#00c4d4] underline"
+                              >
+                                {source.title}
+                              </a>
+                            ) : (
+                              <span>{source.title}</span>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-sm text-gray-500 italic">
+                        No external sources were cited for this article.
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Editorial Section */}
+                <div>
+                  <h4 className="text-lg font-semibold text-[#1e3a4b] mb-3 flex items-center gap-2">
+                    <svg className="w-5 h-5 text-[#00d8e8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    Editorial Information
+                  </h4>
+                  <div className="pl-7 space-y-2 text-sm text-gray-600">
+                    <p><span className="font-medium text-[#1e3a4b]">Category:</span> {post.category}</p>
+                    <p><span className="font-medium text-[#1e3a4b]">Read Time:</span> {post.readTime}</p>
+                    {userType != 'anonymous' && (<p><span className="font-medium text-[#1e3a4b]">Visibility:</span> {post.visibility}</p>)}
+                    <p><span className="font-medium text-[#1e3a4b]">Last Updated:</span> {new Date(post.publishedAt).toLocaleDateString()}</p>
+                  </div>
+                </div>
+
+                {/* Disclaimer */}
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <h4 className="text-sm font-semibold text-yellow-800 mb-2 flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.728-.833-2.498 0L4.316 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                    </svg>
+                    Disclaimer
+                  </h4>
+                  <p className="text-xs text-yellow-700">
+                    The information provided in this article is for informational purposes only and should not be considered as professional advice. 
+                    Please consult with relevant professionals for specific guidance related to your situation.
+                  </p>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="mt-8 pt-4 border-t border-gray-200 flex justify-end">
+                <button
+                  onClick={() => setShowCreditsModal(false)}
+                  className="px-6 py-2 bg-[#00d8e8] text-white rounded-lg hover:bg-[#00c4d4] transition-colors duration-200 font-medium"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
-  )}
+  )
+}

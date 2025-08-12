@@ -6,6 +6,12 @@ export type AuthorType = 'md' | 'general' | 'notice' // Using your original valu
 
 export type Visibility = 'public' | 'internal' | 'restricted'
 
+
+export interface BlogSource {
+  title: string;
+  url: string;
+}
+
 export interface BlogPost {
   id: number // Keep as number from your original
   title: string
@@ -20,6 +26,7 @@ export interface BlogPost {
   readTime: string
   visibility: Visibility
   featured?: boolean // Keep your original featured property
+  sources?: BlogSource[];
 }
 
 // Your original BlogFilters interface (keeping it)
@@ -42,6 +49,7 @@ export interface CreatePostData {
   readTime: string
   visibility: Visibility
   featured?: boolean
+  sources?: BlogSource[];
 }
 
 export interface UpdatePostData extends Partial<CreatePostData> {

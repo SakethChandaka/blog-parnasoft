@@ -6,6 +6,7 @@ import { blogService, getBadgeInfo, getVisibilityBadge } from '../services/blogS
 import { BlogPost, UserType, AuthorType, Visibility } from '../types/blog'
 import { useAuth } from '../contexts/AuthContext'
 import UserManagement from '../components/UserManagement'
+import { sources } from 'next/dist/compiled/webpack/webpack'
 
 interface AdminPageProps {}
 
@@ -711,7 +712,9 @@ function PostModal({ isOpen, onClose, post, onSave }: PostModalProps) {
     authorType: post?.authorType || 'general' as AuthorType,
     visibility: post?.visibility || 'public' as Visibility,
     readTime: post?.readTime || '5 min read',
-    featured: post?.featured || false
+    featured: post?.featured || false,
+    sources: post?.sources ? post.sources.map(s => `${s.title}:${s.url}`).join(', ')
+      : ''
   })
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
@@ -724,10 +727,27 @@ function PostModal({ isOpen, onClose, post, onSave }: PostModalProps) {
     try {
       const postData: Partial<BlogPost> = {
         ...formData,
-        tags: formData.tags.split(',').map(tag => tag.trim()).filter(Boolean),
-        slug: formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+        tags: formData.tags
+          .split(',')
+          .map(tag => tag.trim())
+          .filter(Boolean),
+        sources: formData.sources
+          .split(',')
+          .map(s => s.trim())
+          .filter(Boolean)
+          .map(s => {
+            const match = s.match(/^([^:]+):(.*)$/);
+            return match
+              ? { title: match[1].trim(), url: match[2].trim() }
+              : { title: s.trim(), url: '' };
+          })
+          ,
+        slug: formData.title
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)/g, ''),
         publishedAt: post?.publishedAt || new Date().toISOString()
-      }
+      };
 
       if (post) {
         await blogService.updatePostById({ ...post, ...postData } as BlogPost)
@@ -873,6 +893,17 @@ function PostModal({ isOpen, onClose, post, onSave }: PostModalProps) {
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00d8e8] focus:border-transparent font-mono text-sm"
               placeholder="Enter your HTML content here..."
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Sources/Credits</label>
+            <textarea
+              rows={6}
+              value={formData.sources}
+              onChange={(e) => setFormData({ ...formData, sources: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00d8e8] focus:border-transparent font-mono text-sm"
+              placeholder="Enter your Sources content here... Title:URL seperated by a comma"
             />
           </div>
 
