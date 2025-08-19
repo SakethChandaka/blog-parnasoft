@@ -20,6 +20,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
   const [error, setError] = useState<string | null>(null)
   const [currentUrl, setCurrentUrl] = useState('')
   const [showCreditsModal, setShowCreditsModal] = useState(false)
+  const [showScrollToTop, setShowScrollToTop] = useState(false)
   const router = useRouter()
 
   // Get user type from auth context
@@ -33,6 +34,24 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
   useEffect(() => {
     setCurrentUrl(window.location.href)
   }, [])
+
+  // Handle scroll to top button visibility
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollToTop(window.scrollY > 300)
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // Scroll to top function
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    })
+  }
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -539,6 +558,19 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Scroll to Top Button */}
+      {showScrollToTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-8 right-8 z-40 w-12 h-12 bg-gradient-to-r from-[#00d8e8] to-[#00c4d4] text-white rounded-full shadow-lg hover:from-[#00c4d4] hover:to-[#00b8c8] transition-all duration-300 hover:shadow-xl hover:scale-105 flex items-center justify-center"
+          aria-label="Scroll to top"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+          </svg>
+        </button>
       )}
     </div>
   )
